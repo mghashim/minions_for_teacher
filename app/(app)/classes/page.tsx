@@ -4,7 +4,7 @@ import { requireTeacher } from '@/lib/auth/session';
 import { CreateClassForm } from './CreateClassForm';
 
 export default async function ClassesPage() {
-  await requireTeacher();
+  const teacher = await requireTeacher();
   const classes = await prisma.class.findMany({
     where: { teacherId: teacher.id },
     include: {
