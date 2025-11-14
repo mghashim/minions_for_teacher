@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": ".tests-out",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2019",
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "typeRoots": ["./types", "./node_modules/@types"],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "tests/harness.ts",
+    "tests/run-*.ts",
+    "tests/server/**/*.ts",
+    "tests/ui/**/*.tsx",
+    "lib/ai/lessonPlanner.ts",
+    "lib/validation.ts",
+    "components/CalendarTimeline.tsx",
+    "types/**/*.d.ts"
+  ],
+  "exclude": ["node_modules", ".next", "out"]
+}
