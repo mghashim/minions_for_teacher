@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Teacher {
+  id            String              @id @default(cuid())
+  name          String
+  email         String              @unique
+  authProvider  String
+  createdAt     DateTime            @default(now())
+  classes       Class[]
+  integrations  IntegrationToken[]
+  notifications Notification[]
+}
+
+model Class {
+  id              String          @id @default(cuid())
+  teacherId       String
+  teacher         Teacher         @relation(fields: [teacherId], references: [id])
+  name            String
+  subject         String
+  level           String
+  timetableColor  String          @default("#1e40af")
+  createdAt       DateTime        @default(now())
+  lessonPlans     LessonPlan[]
+  sessions        LessonSession[]
+  students        Student[]
+}
+
+model Student {
+  id        String @id @default(cuid())
+  classId   String
+  class     Class  @relation(fields: [classId], references: [id])
+  name      String
+  email     String?
+  createdAt DateTime @default(now())
+}
+
+model LessonPlan {
+  id                 String        @id @default(cuid())
+  classId            String
+  class              Class         @relation(fields: [classId], references: [id])
+  title              String
+  objectives         Json
+  resources          Json
+  plannedDurationMins Int
+  plannedDateTime    DateTime?
+  createdAt          DateTime      @default(now())
+  sessions           LessonSession[]
+}
+
+model LessonSession {
+  id            String       @id @default(cuid())
+  classId       String
+  planId        String?
+  class         Class        @relation(fields: [classId], references: [id])
+  plan          LessonPlan?  @relation(fields: [planId], references: [id])
+  startDateTime DateTime
+  endDateTime   DateTime?
+  status        SessionStatus @default(scheduled)
+  progressNotes ProgressNote[]
+  createdAt     DateTime       @default(now())
+}
+
+enum SessionStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+}
+
+model ProgressNote {
+  id              String   @id @default(cuid())
+  sessionId       String
+  session         LessonSession @relation(fields: [sessionId], references: [id])
+  summary         String
+  assignmentsGiven Json
+  nextFocus       String
+  createdAt       DateTime @default(now())
+}
+
+model IntegrationToken {
+  id         String   @id @default(cuid())
+  teacherId  String
+  teacher    Teacher  @relation(fields: [teacherId], references: [id])
+  provider   IntegrationProvider
+  token      String
+  createdAt  DateTime @default(now())
+
+  @@unique([teacherId, provider], name: "teacherId_provider")
+}
+
+enum IntegrationProvider {
+  google_calendar
+  google_tasks
+  openai
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  teacherId  String
+  teacher    Teacher  @relation(fields: [teacherId], references: [id])
+  type       NotificationType
+  payload    Json
+  scheduledAt DateTime
+  sentAt     DateTime?
+  createdAt  DateTime @default(now())
+}
+
+enum NotificationType {
+  lesson_reminder
+  mid_lesson_nudge
+}

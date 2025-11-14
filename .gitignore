@@ -19,6 +19,7 @@
 
 # production
 /build
+/.tests-out
 
 # misc
 .DS_Store

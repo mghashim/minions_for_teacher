@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI-assisted Teacher Diary and Class Assistant
 
-## Getting Started
+A tablet-friendly Next.js application that helps teachers plan lessons, capture in-lesson notes, and request AI-generated daily lesson flows.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Passwordless email sign-in powered by NextAuth credentials.
+- Dashboard timeline for the next 7 days with reminder toasts.
+- Class management with lesson plan CRUD and session scheduling.
+- Live lesson view with AI-assisted plans, pacing nudges, and quick progress notes.
+- Optional Google Calendar sync stub and JSON export for backups.
+- Prisma/PostgreSQL data model with seed data for demo usage.
+- Offline-friendly TypeScript test harness alongside Playwright e2e scaffolds.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+2. **Generate Prisma client**
+   ```bash
+   npm run prepare
+   ```
+3. **Configure environment**
+   Copy `.env.example` to `.env.local` and update the values (database URL, secrets, optional API keys).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Database setup**
+   ```bash
+   npm run db:migrate
+   npm run db:seed
+   ```
 
-## Learn More
+5. **Development server**
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+6. **Running tests**
+   ```bash
+   npm run test        # Compile once and run all tests
+   npm run test:unit   # UI-focused suite (render to markup)
+   npm run test:server # Server utility suite
+   npm run test:e2e    # Playwright (requires running dev server)
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+7. **Linting**
+   ```bash
+   npm run lint
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Data model
 
-## Deploy on Vercel
+The Prisma schema models teachers, classes, students, lesson plans, sessions, progress notes, integration tokens, and notifications. See `prisma/schema.prisma` for details. Run `npx prisma studio` for a UI explorer.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Seed data provides:
+- 1 demo teacher (`demo.teacher@example.com`)
+- 2 classes (Maths, Literature)
+- 4 lesson plans across the week
+- 2 sessions with example progress notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Security and accessibility
+
+- All API routes validate input with Zod and enforce ownership checks.
+- AI endpoints include a simple in-memory rate limiter.
+- Secrets remain server-side; client components call typed API routes.
+- Tailwind styling targets WCAG AA colour contrast and keyboard focus states.
+
+## Integrations
+
+- `lib/ai/lessonPlanner.ts` uses OpenAI if `OPENAI_API_KEY` is provided, otherwise a deterministic fallback generator.
+- `lib/google/calendar.ts` documents the TODOs for full OAuth2 calendar sync.
+- Resource suggestion toggle in the live lesson view surfaces stubbed recommendations until AI integration is available.
+
+## Testing notes
+
+- Custom TypeScript harness renders UI components to static markup for assertions.
+- The same harness exercises deterministic server utilities (AI fallback, validation).
+- Playwright smoke test ensures the sign-in page renders in CI.
+
+## Scripts
+
+- `npm run db:migrate` – run migrations in development.
+- `npm run db:seed` – seed the database with demo content.
+- `npm run build` / `npm run start` – build and run the production bundle.
+
+Happy teaching!
